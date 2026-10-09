@@ -1,32 +1,24 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Anyone can view the public fundraising total and donor list.
-    // Only the explicitly configured administrator UID can create, edit, or delete records.
+    // Public visitors can view fundraiser records; only the configured admin can write.
     function isAdmin() {
-      return request.auth != null
-        && request.auth.uid == "PASTE_ADMIN_AUTH_UID_HERE";
+      return request.auth != null && request.auth.uid == "mFNFsXscjqZOIkGIKtTzPyH5Xc83";
+    }
+    function validDonation() {
+      return request.resource.data.keys().hasOnly(['name','amount','date','createdAt','updatedAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.amount is int
+        && request.resource.data.amount > 0
+        && request.resource.data.amount <= 1000000000
+        && request.resource.data.date is string
+        && request.resource.data.date.size() == 10;
     }
     match /donations/{donationId} {
       allow read: if true;
-      allow create: if isAdmin()
-        && request.resource.data.keys().hasOnly(['name','amount','date','createdAt','updatedAt'])
-        && request.resource.data.name is string
-        && request.resource.data.name.size() > 0
-        && request.resource.data.name.size() <= 100
-        && request.resource.data.amount is int
-        && request.resource.data.amount > 0
-        && request.resource.data.amount <= 1000000000
-        && request.resource.data.date is string;
-      allow update: if isAdmin()
-        && request.resource.data.keys().hasOnly(['name','amount','date','createdAt','updatedAt'])
-        && request.resource.data.name is string
-        && request.resource.data.name.size() > 0
-        && request.resource.data.name.size() <= 100
-        && request.resource.data.amount is int
-        && request.resource.data.amount > 0
-        && request.resource.data.amount <= 1000000000
-        && request.resource.data.date is string;
+      allow create, update: if isAdmin() && validDonation();
       allow delete: if isAdmin();
     }
   }
