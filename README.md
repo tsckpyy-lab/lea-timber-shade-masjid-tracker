@@ -20,3 +20,6 @@ The 13 starter records from the previous preview (₦65,000 total) are not autom
 - [ ] Anonymous and non-admin users cannot write.
 - [ ] WhatsApp sharing and group invite work.
 - [ ] Verify account details with the committee before launch.
+
+
+Deployment status check requested on 2026-10-09.
